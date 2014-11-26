@@ -1,0 +1,21 @@
+#!/bin/bash -e
+if [ "$2" == "" ]; then
+  echo "USAGE: $0 <from> <to>"
+  echo "Example: $0 subdomain.example.com subdomain.local"
+  exit 1
+fi
+
+cd /data/crt
+manage.generate-self-signed-certificate $1
+
+cat << EOF > /etc/nginx/sites-available/$1.conf
+server {
+        server_name $1;
+        listen              80;
+	return       301 https://\$host\$request_uri;
+}
+EOF
+ln -sf ../sites-available/$1.conf /etc/nginx/sites-enabled/$1.conf
+/etc/init.d/nginx configtest
+/etc/init.d/nginx reload
+
