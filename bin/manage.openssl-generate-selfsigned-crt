@@ -1,4 +1,5 @@
 #!/bin/bash
+. `dirname $0`/../share/managetools/functions.sh
 DOMAIN=$1
 if [ "$DOMAIN" == "" ]; then
   echo "USAGE: $0 <domain name>"
@@ -13,6 +14,6 @@ if [ -f $DOMAIN.crt ]; then
   echo "Certificate exists. Will not overwrite."
   exit 0
 fi
-
-openssl req -x509 -newkey rsa:2048 -keyout $DOMAIN.pem -out $DOMAIN.crt -days XX -nodes
+`getbinary printf` "RU\nRussia\nMoscow\nMiracle Field\nMoney Tree department\n$DOMAIN\nalice@example.com\n" |\
+    `getbinary openssl` req -x509 -newkey rsa:2048 -keyout $DOMAIN.pem -out $DOMAIN.crt -days XX -nodes
 

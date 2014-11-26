@@ -1,11 +1,13 @@
 #!/bin/bash -e
+. `dirname $0`/../share/managetools/functions.sh
+getbinary nginx
 if [ "$2" == "" ]; then
   echo "USAGE: $0 <from> <to>"
   echo "Example: $0 subdomain.example.com subdomain.local"
   exit 1
 fi
 
-cd /data/crt
+cd `getconf certificate_folder`
 manage.generate-self-signed-certificate $1
 
 cat << EOF > /etc/nginx/sites-available/$1.conf

@@ -1,0 +1,53 @@
+#!/bin/sh -e
+. `dirname $0`/../share/managetools/functions.sh
+
+MACHINE=$1
+if [ "$MACHINE" = "" ]; then
+  echo "USAGE: $0 <vm name>"
+  exit 1
+fi
+
+template=`getconf template`
+images=`getconf libvirt_kvm_images`
+domain=`getconf libvirt_host_domain`
+disk=$images/$MACHINE.img
+mountpoint=/mnt/libvirt.creation.$MACHINE
+VIRSH=`getbinary virsh`
+VIRTCLONE=`getbinary virt-clone`
+GUESTMOUNT=`getbinary guestmount`
+FUSERMOUNT=`getbinary fusermount`
+CAT=`getbinary cat`
+
+if [ -e $mountpoint ]; then
+  echo "Unclean mount point. Seems previous creation failed. Contact system administrator."
+fi
+
+$VIRTCLONE --connect qemu:///system --original $template --name $MACHINE --file $disk
+$VIRSH autostart $MACHINE
+
+notice "Mounting cloned drive"
+mkdir $mountpoint
+$GUESTMOUNT -a $disk -m /dev/sda1 $mountpoint
+ls $mountpoint
+
+echo "Creating proper host configuration"
+$CAT << EOF > $mountpoint/etc/hostname
+$MACHINE
+EOF
+
+$CAT << EOF > $mountpoint/etc/hosts
+127.0.0.1       localhost
+127.0.1.1       $MACHINE $MACHINE.local $MACHINE.test.$domain
+
+# The following lines are desirable for IPv6 capable hosts
+::1     localhost ip6-localhost ip6-loopback
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+EOF
+
+echo "Umounting it"
+$FUSERMOUNT -u $mountpoint
+sleep 3
+rmdir $mountpoint
+
+$VIRSH start $MACHINE

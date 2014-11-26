@@ -1,0 +1,17 @@
+#!/bin/bash
+. `dirname $0`/../share/managetools/functions.sh
+if [ "$2." == "." ]; then
+  echo "USAGE: $0 <certificate> <private key>"
+  exit 1
+fi
+OPENSSL=`getbinary openssl`
+
+HASH1=$($OPENSSL x509 -noout -modulus -in $1 | $OPENSSL md5)
+HASH2=$($OPENSSL rsa -noout -modulus -in $2 | $OPENSSL md5)
+
+if [ "$HASH1" != "$HASH2" ]; then
+  echo "Certificate does not match private key!"
+  exit 1
+fi
+
+$OPENSSL x509 -text -noout -in $1

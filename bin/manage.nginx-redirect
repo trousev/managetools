@@ -1,4 +1,6 @@
 #!/bin/bash -e
+. `dirname $0`/../share/managetools/functions.sh
+getbinary nginx
 if [ "$2" == "" ]; then
   echo "USAGE: $0 <from> <to>"
   echo "Example: $0 subdomain.example.com subdomain.local"
