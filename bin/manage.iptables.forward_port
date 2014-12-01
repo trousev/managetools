@@ -1,0 +1,22 @@
+#!/bin/sh -e
+. `dirname $0`/../share/managetools/functions.sh
+IPTABLES=`getbinary iptables`
+
+internal_network_card=`getconf internal_network_card`
+external_network_card=`getconf external_network_card`
+
+source_port=`getconf source_port`
+target_port=`getconf target_port`
+target_ip=`getconf target_ip`
+
+if [ "$1." = "close." ]; then
+  action=-D
+elif [ "$1." = "open." ]; then
+  action="-A"
+else
+  echo "Action required. Use <open> or <close>"
+  exit 1
+fi
+
+iptables $action PREROUTING -t nat -p tcp -i $external_network_card --dport $source_port -j DNAT --to-destination $target_ip:$target_port
+iptables -I FORWARD -m state -d 10.0.0.0/24 --state NEW,RELATED,ESTABLISHED -j ACCEPT
