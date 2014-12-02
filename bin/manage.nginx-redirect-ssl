@@ -8,7 +8,7 @@ if [ "$2" == "" ]; then
 fi
 
 cd `getconf certificate_folder`
-manage.generate-self-signed-certificate $1
+manage.openssl-generate-selfsigned-crt $1
 
 cat << EOF > /etc/nginx/sites-available/$1.ssl.conf
 server {
