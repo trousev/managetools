@@ -3,7 +3,9 @@ managetools_functions_prefixes="/etc/managetools `dirname $0`/../etc/managetools
 managetools_functions_configs="managetools.conf `basename $0`.conf"
 
 debug() {
-    echo "[DEBUG] $@" 1>&2
+    if [ $MANAGETOOLS_DEBUG == 1 ]; then
+        echo "[DEBUG] $@" 1>&2
+    fi
 }
 notice() {
     echo "[NOTICE] $@" 1>&2
@@ -54,7 +56,34 @@ checkversion () {
     return 0
 }
 
+# Usage: checkpackage <package name>
+checkpackage () {
+    DPKGQ=`getbinary dpkg-query`
+    RESULT=0
+    $DPKGQ -l "$1" 1> /dev/null 2> /dev/null || RESULT=1
+    if [ $RESULT == 1 ]; then
+        error "No such package: $1"
+    fi
+    return $RESULT
+}
+# Usage: installpackage <check query> <package name>
+installpackage () {
+    DPKGQ=`getbinary dpkg-query`
+    APTGET=`getbinary apt-get`
+    SUDO=`getbinary sudo` #TODO: need to make clever check
+
+    INSTALLED=1
+    $DPKGQ -l "$1" 1> /dev/null 2> /dev/null || INSTALLED=0
+    if [ $INSTALLED == 0 ]; then
+        $SUDO $APTGET -y install $2
+    else
+        notice "Skipping $2, because $1 is installed."
+    fi
+    checkpackage $1
+}
+
 ## Enviroment initialisation below
+MANAGETOOLS_DEBUG=0
     for prefix in $managetools_functions_prefixes; do
         for config in $managetools_functions_configs; do
             if [ -f "$prefix/$config" ]; then
