@@ -1,0 +1,10 @@
+#/bin/bash
+LIST=$(git lola --name-status | grep hsql | grep "D" | sed s/".*\\t"//g)
+for i in $LIST; do
+  echo "[D] $i"
+done
+read -p "Press ENTER to continue or Ctrl+C to abort"
+for i in $LIST; do git.remove-forever $i; done
+
+echo "COMPLETE!"
+echo "Don't forget to push ALL branches"

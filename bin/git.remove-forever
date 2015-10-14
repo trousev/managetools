@@ -1,0 +1,8 @@
+#!/bin/bash
+git filter-branch -f --prune-empty -d /dev/shm/scratch \
+  --index-filter "git rm --cached -f --ignore-unmatch $1" \
+  --tag-name-filter cat -- --all
+rm -rf .git/refs/original/
+git reflog expire --expire=now --all
+git gc --prune=now
+git gc --aggressive --prune=now

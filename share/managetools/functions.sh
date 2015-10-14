@@ -3,7 +3,7 @@ managetools_functions_prefixes="/etc/managetools `dirname $0`/../etc/managetools
 managetools_functions_configs="managetools.conf `basename $0`.conf"
 
 debug() {
-    if [ $MANAGETOOLS_DEBUG == 1 ]; then
+    if [ $MANAGETOOLS_DEBUG = 1 ]; then
         echo "[DEBUG] $@" 1>&2
     fi
 }
@@ -61,7 +61,7 @@ checkpackage () {
     DPKGQ=`getbinary dpkg-query`
     RESULT=0
     $DPKGQ -l "$1" 1> /dev/null 2> /dev/null || RESULT=1
-    if [ $RESULT == 1 ]; then
+    if [ $RESULT = 1 ]; then
         error "No such package: $1"
     fi
     return $RESULT
@@ -74,7 +74,7 @@ installpackage () {
 
     INSTALLED=1
     $DPKGQ -l "$1" 1> /dev/null 2> /dev/null || INSTALLED=0
-    if [ $INSTALLED == 0 ]; then
+    if [ $INSTALLED = 0 ]; then
         $SUDO $APTGET -y install $2
     else
         notice "Skipping $2, because $1 is installed."

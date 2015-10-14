@@ -1,0 +1,13 @@
+#!/bin/sh -e
+. `dirname $0`/../share/managetools/functions.sh
+if [ ".$1" = "." ]; then
+    echo "USAGE: $0 <package name>"
+    exit 1
+fi
+cd ~/build
+mkdir $1
+cd $1
+npm2debian --versioned $1
+
+cd npm-$1-*
+dpkg-buildpackage -rfakeroot

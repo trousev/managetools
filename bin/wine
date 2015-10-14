@@ -1,0 +1,171 @@
+#!/bin/bash -e
+STORAGE=/opt/wine
+PREFIX_NAME="default"
+WINE_NAME="default"
+
+function load_prefix
+{
+    if [ "$PREFIX_NAME" == "default" ]; then
+        guess=$(echo $1 | grep "/opt/wine/prefix" | sed s@/opt/wine/prefix/@@g | sed s@/.*@@g)
+        if [ "$guess" != "" ]; then
+            PREFIX_NAME=$guess
+        fi
+    fi
+    echo "Prefix: $PREFIX_NAME"
+
+    if [ -e "$STORAGE/prefix/$PREFIX_NAME/prefix.conf" ]; then
+        source $STORAGE/prefix/$PREFIX_NAME/prefix.conf
+        echo "Overrided WINE_NAME=$WINE_NAME ($WINEPREFIX)"
+    else
+        echo "Invalid or template prefix. Please, create correct one."
+        exit 1
+    fi
+}
+
+mkdir -p $STORAGE/prefix
+mkdir -p $STORAGE/wine
+mkdir -p $STORAGE/shortcuts
+
+while [ true ]; do
+    if [ "$1." == "--wine". ]; then
+        shift
+        if [ $1. == "." ]; then
+            echo "FAILURE: --prefix expects value"
+            exit 1
+        fi
+        WINE_NAME=$1
+        shift
+        continue
+    fi
+    if [ "$1." == "--prefix". ]; then
+        shift
+        if [ $1. == "." ]; then
+            echo "FAILURE: --prefix expects value"
+            exit 1
+        fi
+        PREFIX_NAME=$1
+        shift
+        continue
+    fi
+    break
+done
+
+
+function check_wine
+{
+    if [ ! -e $WINE ]; then
+        echo "No wine executable at $WINE"
+        exit 1
+    fi
+    if [ ! -e $WINEPREFIX ]; then
+        echo "No prefix exists at $WINEPREFIX. Maybe You should create it?"
+        exit 1
+    fi
+    if [ -e $WINEPREFIX/init ]; then
+        source $WINEPREFIX/init
+    fi
+}
+
+countargs () {
+        return $#
+}
+
+    if [ ".$1" == "." ]; then
+        echo "USAGE: wine <command>"
+        exit 1
+    fi
+    if [ ".$1" == ".off" ]; then
+        killall wineserver || true
+        killall winedevice.exe || true
+        exit 0
+    fi
+    if [ ".$1" == ".create" ]; then
+        shift
+        if [ $1. == "." ]; then
+            echo "FAILURE: create expects new prefix name"
+            exit 1
+        fi
+        NEWPREFIX="$STORAGE/prefix/$1"
+        if [ -e $NEWPREFIX ]; then
+            echo "FAILURE: folder with 'new' prefix already exists"
+            exit 1
+        fi
+        export WINE="$STORAGE/wine/$WINE_NAME/bin/wine"
+        export WINEPREFIX="$STORAGE/prefix/$PREFIX_NAME"
+        check_wine
+        cp -rf $WINEPREFIX $NEWPREFIX
+        echo export WINE=$WINE > $NEWPREFIX/prefix.conf
+        echo export WINE_NAME=$WINE_NAME >> $NEWPREFIX/prefix.conf
+        exit 0
+    fi
+
+    if [ ".$1" == ".edit" ]; then
+        load_prefix
+        shift
+        export WINE="$STORAGE/wine/$WINE_NAME/bin/wine"
+        export WINEPREFIX="$STORAGE/prefix/$PREFIX_NAME"
+        check_wine
+        echo "WINE $WINE"
+        echo "PREFIX $WINEPREFIX"
+        vim $WINEPREFIX/init
+        exit 0
+    fi
+
+    if [ ".$1" == ".tricks" ]; then
+        load_prefix
+        shift
+        export WINE="$STORAGE/wine/$WINE_NAME/bin/wine"
+        export WINEPREFIX="$STORAGE/prefix/$PREFIX_NAME"
+        check_wine
+        echo "WINE $WINE"
+        echo "PREFIX $WINEPREFIX"
+        if [ -e $STORAGE/winetricks ]; then
+            echo "Winetricks already present. Wanna new version? Remove $STORAGE/winetricks"
+        else
+            wget http://winetricks.org/winetricks -O $STORAGE/winetricks
+        fi
+        chmod +x $STORAGE/winetricks
+        bash $STORAGE/winetricks "$@"
+        exit 0
+    fi
+    if [ -e "$STORAGE/shortcuts/$1" ]; then
+        EXECUTABLE=$(readlink $STORAGE/shortcuts/$1)
+        if [ -e $STORAGE/shortcuts/$1.conf ]; then
+            source $STORAGE/shortcuts/$1.conf
+        fi
+        load_prefix $(readlink $STORAGE/shortcuts/$1)
+        shift
+        export WINE="$STORAGE/wine/$WINE_NAME/bin/wine"
+        export WINEPREFIX="$STORAGE/prefix/$PREFIX_NAME"
+        check_wine
+        $EXEC_PREFIX $WINE "$EXECUTABLE" "$@"
+        exit 0
+    fi
+
+    load_prefix $1
+    export WINE="$STORAGE/wine/$WINE_NAME/bin/wine"
+    export WINEPREFIX="$STORAGE/prefix/$PREFIX_NAME"
+    check_wine
+    echo "Arch: $WINEARCH"
+    $WINE "$@"
+
+
+#if [ ".$1" == ".print" ]; then
+#    echo "PREFIX is $WINEPREFIX"
+#    echo "WINE   is $WINE"
+#    build_options
+#    echo something "$@"
+#fi
+
+
+#export WINEPREFIX=/opt/wine-1.6.2/prefix
+#export WINE=/opt/wine-1.6.2/bin/wine
+#if [ ".$1" == ".tricks" ]; then
+#    bash $(dirname 0)/winetricks $2
+#    exit 0
+#fi
+#if [ -e "/opt/wine-1.6.2/shortcuts/$1" ]; then
+#    $WINE "$(readlink /opt/wine-1.6.2/shortcuts/$1)"
+#    exit 0
+#fi
+#$WINE $*

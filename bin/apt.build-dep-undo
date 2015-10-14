@@ -1,0 +1,6 @@
+#!/bin/bash
+. `dirname $0`/../share/managetools/functions.sh
+ 
+`getbinary sudo` `getbinary aptitude` markauto $(`getbinary apt-cache` showsrc "$1" \
+    | grep Build-Depends \
+    | perl -p -e 's/(?:[\[(].+?[\])]|Build-Depends:|,|\|)//g')

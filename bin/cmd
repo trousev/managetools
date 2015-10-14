@@ -1,0 +1,7 @@
+#!/bin/bash
+. `dirname $0`/../share/managetools/functions.sh
+if [ "$(which konsole)" != "" ]; then
+  `getbinary konsole` --stylesheet /home/doctor/Sync/files/Tech/.config/konsole.qss
+else
+  xterm
+fi

@@ -1,0 +1,28 @@
+#!/bin/sh
+. `dirname $0`/../share/managetools/functions.sh
+NPM=`getbinary npm`
+PACKAGE=$1
+if [ $PACKAGE. = "." ]; then
+    echo "USAGE: $0 <package name>"
+    exit 1
+fi
+mkdir -p /opt/npm-local-registry/$PACKAGE
+
+cat << EOF > /opt/npm-local-registry/$PACKAGE/package.json
+{
+  "name": "package_$1",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
+EOF
+
+cd /opt/npm-local-registry/$PACKAGE
+npm install --save $1
+
+
