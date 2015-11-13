@@ -1,0 +1,3 @@
+#!/bin/bash
+cd "/opt/wine/prefix/heroes3/drive_c/Program Files (x86)/Buka/3DO/h3/"
+wp heroes3 "heroes3hd.exe"

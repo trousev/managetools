@@ -1,0 +1,5 @@
+#!/bin/bash -e
+cd /
+sudo lxc-info -n $1 | grep "STOPPED" && sudo lxc-start -d -n $1 && sleep 2
+sudo xterm -e "lxc-console -n $1" & 1> /dev/null 2> /dev/null
+disown

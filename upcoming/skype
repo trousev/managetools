@@ -1,0 +1,2 @@
+#!/bin/bash
+gksudo -u skype /opt/skype/skype

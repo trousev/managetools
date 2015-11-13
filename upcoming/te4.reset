@@ -1,0 +1,10 @@
+#!/bin/bash
+cd ~/.t-engine
+git log --pretty=oneline
+read -p "Enter revision You want to revert: " rev
+if [ $rev. == . ]; then
+  echo Commit Aborted
+  exit 1
+fi
+git reset --hard $rev
+git clean -f -x -d

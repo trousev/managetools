@@ -1,0 +1,2 @@
+#!/bin/bash
+gksudo -u steam-linux /usr/games/steam

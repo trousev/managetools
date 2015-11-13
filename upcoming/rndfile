@@ -1,0 +1,1 @@
+ls | tail -n $(echo $RANDOM%$(ls | grep "" -c) | bc) | head -n 1 

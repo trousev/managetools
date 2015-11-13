@@ -1,0 +1,17 @@
+#!/bin/bash
+cd ~/.t-engine
+git add -A
+git add -u
+git status
+git commit -a -m  "Game Launch on $(date "+%d/%m'%y, %H-%M")"
+cd /opt/t-engine4-linux64-1.0.4
+sleep 2
+./t-engine
+cd ~/.t-engine
+git add -A
+git add -u
+git status
+read -p "Enter commit message to repository (if You enter nothing -- revert is performed): " commitmsg
+git commit -a -m "$commitmsg"
+git reset --hard
+git clean -f -x -d

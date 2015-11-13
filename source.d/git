@@ -1,0 +1,23 @@
+
+function git() {
+  case $* in
+    lol* ) shift 1; command git log --graph --decorate --pretty=oneline --abbrev-commit "$@"  ;;
+    lola* ) shift 1; command git log --graph --decorate --pretty=oneline --abbrev-commit --all "$@"  ;;
+    graph* ) shift 1; command git log  --oneline --graph --date=relative --pretty=format:"%H %Cred%ad %C(Yellow)%an %C(White) %s%Creset" "$@" ;;
+    moo* ) shift 1; command echo "Mooo!" ;;
+    * ) command git "$@" ;;
+  esac
+}
+
+function svn() {
+  case $* in
+    co*) shift 1; command /usr/bin/git svn dcommit "$@"  ;;
+    clone*) shift 1; command /usr/bin/git svn clone --stdlayout "$@"  ;;
+    up*) shift 1; command /usr/bin/git svn rebase "$@"  ;;
+    stage*) shift 1; git lol | grep HEAD | grep trunk 1> /dev/null  && return 0; return 1 ;;
+    st*) shift 1; command git svn info ; git lol | grep HEAD | grep trunk 1> /dev/null || ( echo "There are unpushed changes"  && git lol | head -n 5) ;;
+    * ) command git svn "$@" ;;
+  esac
+}
+
+git config --global alias.dfw 'diff --ignore-space-change'

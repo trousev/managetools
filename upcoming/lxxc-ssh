@@ -1,0 +1,6 @@
+#!/bin/bash
+if [ $1. == . ]; then
+  echo "USAGE: $0 virtualmachine"
+  exit 0
+fi
+sudo lxc-attach --name $1 -- ifconfig

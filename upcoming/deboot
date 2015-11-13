@@ -1,0 +1,112 @@
+#!/bin/bash -e
+STORAGE=/opt/debootstrap
+
+function check_name
+{
+    if [ "$1." == "." ]; then return 1; fi
+    return 0
+}
+function create
+{
+    path=$STORAGE/$1.env
+    check_name "$1"
+    [ $? != 0 ] && echo "WARNING: incorrect name: $1" && return 1
+    [ -e "$path" ] && echo "FAIL: already exists" && return 1
+    distro=$2
+    debootstrap $distro $path
+    configure "$1"
+}
+function configure
+{
+    path=$STORAGE/$1.env
+    check_name "$1"
+    [ $? != 0 ] && echo "WARNING: incorrect name: $1" && return 1
+    [ ! -e "$path" ] && echo "FAIL: already exists" && return 1
+    cat > $path/etc/fstab << EOF
+# Generated
+proc  /proc  proc rw,noexec,nosuid,nodev
+sysfs  /sys  sysfs rw,noexec,nosuid,nodev
+devpts  /dev/pts  devpts rw,noexec,nosuid,gid=5,mode=0620
+EOF
+    chroot $path apt-get update
+    chroot $path apt-get upgrade
+    chroot $path apt-get install locales
+    cat > $path/etc/locale.gen << EOF
+ru_RU.UTF-8 UTF-8
+en_US.UTF-8 UTF-8
+EOF
+    chroot $path locale-gen
+    touch $path/etc/mtab
+}
+function start
+{
+    path=$STORAGE/$1.env
+    check_name "$1"
+    [ $? != 0 ] && echo "WARNING: incorrect name: $1" && return 1
+    cat << EOF | chroot $path
+mount | grep /proc || mount /proc
+mount | grep /sys || mount /sys
+mount | grep /dev/pts || mount /dev/pts
+EOF
+    chroot $path /bin/bash -l
+}
+function stop
+{
+    path=$STORAGE/$1.env
+    check_name "$1"
+    [ $? != 0 ] && echo "WARNING: incorrect name: $1" && return 1
+
+
+    PREFIX=$path
+    while true; do
+        FOUND=0
+        echo "Killing all processes in chrooted enviroment"
+        for ROOT in /proc/*/root; do
+            LINK=$(readlink $ROOT)
+            if [ "x$LINK" != "x" ]; then
+                if [ "x${LINK:0:${#PREFIX}}" = "x$PREFIX" ]; then
+                    # this process is in the chroot...
+                    PID=$(basename $(dirname "$ROOT"))
+                    kill -9 "$PID"
+                    echo "Killing: $PID"
+                    FOUND=1
+                fi
+            fi
+        done
+
+        if [ "x$FOUND" = "x0" ]; then
+            break
+        fi
+    done
+
+
+
+    cat << EOF | chroot $path
+mount | grep /proc || mount /proc
+mount | grep /sys || mount /sys
+mount | grep /dev/pts || mount /dev/pts
+mount | grep /dev/pts && umount /dev/pts
+mount | grep /proc && umount /proc
+mount | grep /sys && umount /sys
+EOF
+}
+
+function snapshot
+{
+    path=$STORAGE/$1.env
+    check_name "$1"
+    [ $? != 0 ] && echo "WARNING: incorrect name: $1" && return 1
+    if [ $2. == . ]; then
+        echo "Snapshot name required"
+        return 1
+    fi
+    snap=$STORAGE/$1.$2.tar.gz
+    if [ -e $snap ]; then
+        echo "Snapshot already exists"
+    fi
+    stop $1
+    cd $STORAGE && tar cvzf $1.tar.gz $1.env
+}
+
+$*
+

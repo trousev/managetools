@@ -1,0 +1,2 @@
+#!/bin/bash
+echo "Specify linux or windows command plz"

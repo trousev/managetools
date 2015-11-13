@@ -1,0 +1,12 @@
+#!/bin/bash
+if [ -d  ~/prog/pyplay-code ]; then
+  echo "Pyplay: home"
+  cd ~/prog/pyplay-code
+  python pyplay.py
+fi
+
+if [ -d  ~/fun/pyplay-code ]; then
+  echo "Pyplay: work"
+  cd ~/fun/pyplay-code
+  python pyplay.py
+fi

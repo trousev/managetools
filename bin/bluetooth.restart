@@ -1,0 +1,6 @@
+#!/bin/sh
+. `dirname $0`/../share/managetools/functions.sh
+sudo service bluetooth restart
+sudo killall pulseaudio
+
+

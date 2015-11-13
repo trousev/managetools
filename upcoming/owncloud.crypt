@@ -1,0 +1,2 @@
+#!/bin/bash
+encfs ~/ownCloud/Tech/CryptedDevice /opt/media/crypted

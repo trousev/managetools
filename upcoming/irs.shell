@@ -1,0 +1,4 @@
+#!/bin/bash
+export PATH=$PATH:/home/doctor/prog/irscurial/KVT/bin
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/doctor/prog/irscurial/KVT/lib
+bash

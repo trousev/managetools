@@ -1,0 +1,27 @@
+#!/bin/bash
+screen -ls | grep sweethome
+if [ $? == 0 ]; then
+  echo "Session is already running"
+else
+  screen -d -S sweethome -m home.session
+  echo "Waiting..."
+  sleep 15
+fi
+
+if [ $1. == "attach." ]; then
+  screen -x sweethome
+fi
+
+if [ $1. == "ssh." ]; then
+  if [ $2. == . ]; then
+    ssh -XY doctor@cp.trousev.pro
+  else
+    ssh -XY doctor@cp.trousev.pro "ssh -XY $2"
+  fi
+fi
+
+if [ $1. == "fs." ]; then
+  SSHP home
+fi
+
+

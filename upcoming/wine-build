@@ -1,0 +1,14 @@
+#!/bin/bash -e
+RANDOM_SEED=0001
+CHROOT_FOLDER="/tmp/wine-build-$RANDOM_SEED"
+mkdir -p $CHROOT_FOLDER
+sudo apt-get install debootstrap
+cd $CHROOT_FOLDER
+sudo debootstrap --arch i386 jessie chroot32 http://ftp.se.debian.org/debian/
+sudo mount -o bind /proc $CHROOT_FOLDER/chroot32/proc
+sudo cp /etc/resolv.conf $CHROOT_FOLDER/chroot32/etc/resolv.conf
+
+sudo chroot $CHROOT_FOLDER/chroot32
+
+sudo umount $CHROOT_FOLDER/chroot32/proc
+

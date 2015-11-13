@@ -1,0 +1,16 @@
+#!/bin/bash
+ssh doctor@cp.trousev.pro -XYC -c blowfish -D 9999 \
+    -L localhost:8022:localhost:22 \
+    -L localhost:3128:localhost:3128 \
+    -L localhost:25565:localhost:25565 \
+    -L localhost:7657:localhost:7657 \
+    -L localhost:4444:localhost:4444 \
+    -L localhost:4445:localhost:4445 \
+    -L localhost:9050:localhost:9050 \
+    -L localhost:8118:localhost:8118 \
+    -L localhost:8389:10.0.0.5:3389 \
+    -L localhost:30000:localhost:30000 \
+    -L localhost:8390:10.0.0.13:3389
+
+
+

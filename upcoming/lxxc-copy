@@ -1,0 +1,8 @@
+#!/bin/bash -e
+cd /
+if [ $2. == . ]; then
+   echo "USAGE: $0 <from> <to>"
+   exit 0
+fi
+sudo lxc-stop -n $1
+sudo lxc-clone -o $1 -n $2

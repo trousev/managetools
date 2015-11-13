@@ -1,0 +1,12 @@
+if [ -e /opt/thunderbird/thunderbird ]; then
+    /opt/thunderbird/thunderbird
+    exit 0
+fi
+
+if [ -e /usr/bin/thunderbird ]; then
+    /usr/bin/thunderbird
+    exit 0
+fi
+
+
+

@@ -1,0 +1,2 @@
+#!/bin/bash
+gksudo -u tor-browser /opt/tor-browser_en-US/Browser/start-tor-browser

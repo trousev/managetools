@@ -1,0 +1,54 @@
+#!/bin/bash
+function help()
+{
+  echo "USAGE: $0 <prefix> <program> [arguments]"
+  exit 1
+}
+if [ "$1." == . ]; then
+  help
+fi
+export WINEPREFIX=/opt/wine/prefix/$1
+if [ -d $WINEPREFIX ]; then
+  echo "wp is using wineprefix: $WINEPREFIX"
+else
+  ans=U
+  while [ true ]; do
+    read -p "There is no such prefix. Do you want to create? (y/n) " ans
+    if [ $ans. == "n." ]; then
+      exit 1
+    fi
+    if [ $ans. == "y." ]; then
+      break
+    fi
+  done
+fi
+shift
+if [ "$1." == . ]; then
+  while [ true ]; do
+    echo "You're in maintenance menu for prefix: $WINEPREFIX"
+    echo "  t. Launch winetricks"
+    echo "  c. Launch winecfg"
+    echo "  q. Exit"
+    echo "  d. Delete prefix"
+    read -p "Your choise: " ans
+    if [ $ans. == "t." ]; then
+      if [ -f $WINEPREFIX/winetricks ]; then
+        echo "Winetricks presented, OK"
+      else
+        cd $WINEPREFIX
+        wget http://winetricks.org/winetricks
+        chmod +x winetricks 
+      fi
+      read -p "Winetricks query: " l
+      $WINEPREFIX/winetricks $l
+    elif [ $ans. == "c." ]; then
+      optirun wine winecfg
+    elif [ $ans. == "q." ]; then
+      exit 0
+    elif [ $ans. == "d." ]; then
+      rm -rf $WINEPREFIX
+      exit 0
+    fi
+  done
+fi
+optirun wine $*

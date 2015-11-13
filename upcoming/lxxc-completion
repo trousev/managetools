@@ -1,0 +1,19 @@
+_lxxc_completion()
+{
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    opts=$(sudo lxc-list | grep "^ " | sed s/"^ *"//g)
+
+    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+    return 0
+
+}
+complete -F _lxxc_completion lxxc-configure
+complete -F _lxxc_completion lxxc-remove
+complete -F _lxxc_completion lxxc-start
+complete -F _lxxc_completion lxxc-stop
+complete -F _lxxc_completion lxxc-copy
+
