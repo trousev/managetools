@@ -1,1 +1,1 @@
-/opt/firefox/firefox -profilemanager $*
+iceweasel -profilemanager $*

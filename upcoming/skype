@@ -1,2 +1,4 @@
 #!/bin/bash
-gksudo -u skype /opt/skype/skype
+xhost +
+
+sudo -u skype LD_PRELOAD=/usr/lib/mesa-diverted/i386-linux-gnu/libGL.so.1 /usr/bin/skype

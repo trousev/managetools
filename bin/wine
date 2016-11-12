@@ -147,6 +147,7 @@ countargs () {
     export WINEPREFIX="$STORAGE/prefix/$PREFIX_NAME"
     check_wine
     echo "Arch: $WINEARCH"
+    echo "Launchine: $WINE"
     $WINE "$@"
 
 
